@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hermes-outlook"
+version = "1.0.0"
+description = "Read email from classic Outlook (desktop) for Hermes Agent — enumerate mailboxes, list folders, scan/search messages, read full emails, via a Windows PowerShell COM bridge."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Lauritz Loy" }]
+keywords = ["hermes", "hermes-plugin", "outlook", "email", "exchange", "com"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Operating System :: Microsoft :: Windows",
+  "Topic :: Communications :: Email",
+]
+# Stdlib-only: subprocess drives Windows PowerShell, so the plugin never joins
+# Hermes's dependency-resolution set.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Lauritz30/hermes-outlook"
+Issues = "https://github.com/Lauritz30/hermes-outlook/issues"
+
+[tool.setuptools]
+py-modules = ["__init__", "schemas"]
+
+[tool.setuptools.packages.find]
+include = ["outlook*"]
+
+# The PowerShell bridge ships as package data.
+[tool.setuptools.package-data]
+outlook = []

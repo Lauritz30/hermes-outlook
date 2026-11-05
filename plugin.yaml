@@ -1,0 +1,33 @@
+name: hermes-outlook
+version: 1.0.0
+manifest_version: 2
+api_version: 1
+description: >-
+  Read email from classic Outlook (desktop) via a Windows PowerShell COM bridge. Enumerate every
+  mailbox the current profile can see (accounts, shared mailboxes, PST archives), list folders,
+  scan/search messages across one or all mailboxes, and read full emails. Windows-only; no
+  Graph API or M365 admin consent required.
+author: Lauritz Loy
+license: MIT
+homepage: https://github.com/Lauritz30/hermes-outlook
+tags: [outlook, email, mail, exchange, microsoft, office, com]
+platforms: [windows]
+provides_tools:
+  - outlook_status
+  - outlook_list_mailboxes
+  - outlook_list_folders
+  - outlook_search_emails
+  - outlook_get_email
+config_schema:
+  powershell_path:
+    type: str
+    default: "powershell.exe"
+    description: >-
+      Windows PowerShell executable. Classic Outlook COM works from powershell.exe (5.1) and
+      pwsh (7.x); default is fine on Windows.
+  timeout_seconds:
+    type: int
+    default: 120
+    description: >-
+      Max seconds per PowerShell call. Large all-mailbox scans may need more; a slow scan times
+      out rather than hangs.
