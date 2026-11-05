@@ -126,12 +126,38 @@ GET_EMAIL: Dict[str, Any] = {
     },
 }
 
+SEND_EMAIL: Dict[str, Any] = {
+    "name": "outlook_send_email",
+    "description": (
+        "Compose and send (or draft) an email through classic Outlook. By default (send=false) "
+        "the message is opened as a draft in Outlook so the user can review and click Send; set "
+        "send=true only when the email should actually be sent immediately. Attachments are "
+        "absolute paths to local files."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "to": {"type": "string", "description": "Recipients (To), semicolon-separated email addresses or names."},
+            "cc": {"type": "string", "description": "CC recipients, semicolon-separated."},
+            "bcc": {"type": "string", "description": "BCC recipients, semicolon-separated."},
+            "subject": {"type": "string", "description": "Subject line."},
+            "body": {"type": "string", "description": "Email body (plain text, or HTML when body_is_html=true)."},
+            "body_is_html": {"type": "boolean", "description": "Treat body as HTML (default false)."},
+            "attachments": {"type": "array", "items": {"type": "string"}, "description": "Absolute paths to local files to attach."},
+            "importance": {"type": "integer", "description": "0=low, 1=normal, 2=high (default normal)."},
+            "send": {"type": "boolean", "description": "true = send now; false (default) = open as a draft for review."},
+        },
+        "required": ["to"],
+    },
+}
+
 TOOL_SCHEMAS = (
     STATUS,
     LIST_MAILBOXES,
     LIST_FOLDERS,
     SEARCH_EMAILS,
     GET_EMAIL,
+    SEND_EMAIL,
 )
 
 __all__ = [
@@ -140,6 +166,7 @@ __all__ = [
     "LIST_FOLDERS",
     "LIST_MAILBOXES",
     "SEARCH_EMAILS",
+    "SEND_EMAIL",
     "STATUS",
     "STORE",
     "TOOL_SCHEMAS",

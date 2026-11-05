@@ -482,6 +482,54 @@ function Invoke-GetEmail {
     return $result
 }
 
+function Invoke-SendEmail {
+    param($P)
+    $to = [string]$P.to
+    if ([string]::IsNullOrWhiteSpace($to)) { throw "to is required." }
+
+    $send = $false
+    if ($null -ne $P.send) { $send = [bool]$P.send }
+
+    $mail = $script:outlook.CreateItem(0)   # 0 = olMailItem
+    $mail.Subject = [string]$P.subject
+    $mail.To = $to
+    if ($null -ne $P.cc -and $P.cc) { $mail.CC = [string]$P.cc }
+    if ($null -ne $P.bcc -and $P.bcc) { $mail.BCC = [string]$P.bcc }
+
+    $body = [string]$P.body
+    $html = $false
+    if ($null -ne $P.body_is_html) { $html = [bool]$P.body_is_html }
+    if ($html) { $mail.HTMLBody = $body } else { $mail.Body = $body }
+
+    if ($null -ne $P.importance) {
+        $imp = [int]$P.importance
+        if ($imp -ge 0 -and $imp -le 2) { $mail.Importance = $imp }
+    }
+
+    $attPaths = @()
+    if ($null -ne $P.attachments) { $attPaths = @($P.attachments) }
+    foreach ($p in $attPaths) {
+        $ap = [string]$p
+        if (-not (Test-Path -LiteralPath $ap -PathType Leaf)) { throw "Attachment not found: $ap" }
+        $null = $mail.Attachments.Add($ap)
+    }
+
+    $subj = [string]$mail.Subject
+    if ($send) {
+        $mail.Send()
+        [pscustomobject]@{
+            ok = $true; action = 'send_email'; sent = $true; mode = 'send'
+            subject = $subj; to = $to
+        }
+    } else {
+        $mail.Display()
+        [pscustomobject]@{
+            ok = $true; action = 'send_email'; sent = $false; mode = 'draft'
+            subject = $subj; to = $to
+        }
+    }
+}
+
 # --- Main -------------------------------------------------------------------
 
 try {
@@ -499,6 +547,7 @@ try {
         'list_folders'    { $result = Invoke-ListFolders $p }
         'search_emails'   { $result = Invoke-Search $p }
         'get_email'       { $result = Invoke-GetEmail $p }
+        'send_email'      { $result = Invoke-SendEmail $p }
         default           { throw "Unknown action: $action" }
     }
     Write-Result $result

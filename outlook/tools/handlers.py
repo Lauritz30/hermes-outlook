@@ -42,6 +42,9 @@ def _summary(action: str, data: Dict[str, Any]) -> str:
             f"from {email.get('sender_name') or email.get('sender_email') or '(unknown)'} "
             f"— {email.get('attachment_count', 0)} attachment(s)."
         )
+    if action == "send_email":
+        mode = "sent" if data.get("sent") else "opened as a draft in Outlook for review"
+        return f"Email {mode}: '{data.get('subject', '(no subject)')}' to {data.get('to', '?')}."
     return "Done."
 
 
@@ -75,12 +78,19 @@ def outlook_get_email(args: Mapping[str, Any], task_id: str = "default", **kwarg
     return _run("get_email", args)
 
 
+@guarded
+def outlook_send_email(args: Mapping[str, Any], task_id: str = "default", **kwargs: Any) -> str:
+    del task_id, kwargs
+    return _run("send_email", args)
+
+
 HANDLERS: Dict[str, Any] = {
     "outlook_status": outlook_status,
     "outlook_list_mailboxes": outlook_list_mailboxes,
     "outlook_list_folders": outlook_list_folders,
     "outlook_search_emails": outlook_search_emails,
     "outlook_get_email": outlook_get_email,
+    "outlook_send_email": outlook_send_email,
 }
 
 __all__ = ["HANDLERS"]

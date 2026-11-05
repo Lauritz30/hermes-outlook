@@ -1,6 +1,6 @@
 ---
 name: outlook-mail
-description: Read email from classic Outlook (desktop) with the hermes-outlook extension. Use when asked to check, read, search, scan or summarize email, mailboxes, inboxes, or folders in Microsoft Outlook — across all accounts, shared mailboxes and PST archives.
+description: Read and send email from classic Outlook (desktop) with the hermes-outlook extension. Use when asked to check, read, search, scan, summarize, send, or draft email, mailboxes, inboxes, or folders in Microsoft Outlook — across all accounts, shared mailboxes and PST archives.
 version: 1.0.0
 author: Lauritz Loy, Hermes Agent
 license: MIT
@@ -38,6 +38,7 @@ Use the `outlook_*` tools (they start with `outlook_`). This skill covers *how* 
 | List folders in one mailbox (optionally recursive) | `outlook_list_folders` |
 | Scan/search messages across one or all mailboxes | `outlook_search_emails` |
 | Read one full email (body, recipients, attachments) | `outlook_get_email` |
+| Compose/send an email (draft or send) | `outlook_send_email` |
 
 ## Searching well
 
@@ -58,6 +59,22 @@ Use the `outlook_*` tools (they start with `outlook_`). This skill covers *how* 
 non-default mailbox) the same `store` name — EntryIDs are only unique within their store. It
 returns subject, sender, to/cc/bcc, sent/received times, the plain-text body (truncated to
 `max_body_chars`, default 20000), and the attachment list (name + size, not content).
+
+## Sending email (safely)
+
+`outlook_send_email` composes a message and, **by default (`send: false`)**, opens it as a draft
+in Outlook for the user to review and click Send. It only actually sends when `send: true` is
+passed explicitly.
+
+- **Never set `send: true` unless the user explicitly asked to send that message right now.**
+  The default draft path is the safe answer to "prepare/draft an email" requests.
+- `to` is required (semicolon-separate multiple recipients); `cc`, `bcc`, `subject`, `body` are
+  optional. `body_is_html: true` switches to the HTML body.
+- `attachments` is a list of **absolute local file paths**; a missing path is an error raised
+  before anything is displayed or sent.
+- `importance`: 0 = low, 1 = normal, 2 = high.
+- After a draft opens, the user edits/attaches more in Outlook and sends from there — no
+  round-trip back through the tool needed.
 
 ## Limits & gotchas
 
