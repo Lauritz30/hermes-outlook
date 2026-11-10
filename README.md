@@ -16,7 +16,7 @@ Windows-only. Talks to the local Outlook MAPI session through `Outlook.Applicati
 | `outlook_list_folders` | Folders in a mailbox (optionally recursive) with item counts. |
 | `outlook_search_emails` | Search across one mailbox or **all** mailboxes; filters for subject/sender/recipient/body/unread/attachments/date range. |
 | `outlook_get_email` | Full email by EntryID: recipients, body, attachments, categories, flags. |
-| `outlook_send_email` | Compose and send — or open as a draft for review — an email with attachments. |
+| `outlook_send_email` | Compose and send — or open as a draft for review — an email with attachments, from any of your accounts. |
 
 ## How it works
 

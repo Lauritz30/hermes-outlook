@@ -70,6 +70,8 @@ passed explicitly.
   The default draft path is the safe answer to "prepare/draft an email" requests.
 - `to` is required (semicolon-separate multiple recipients); `cc`, `bcc`, `subject`, `body` are
   optional. `body_is_html: true` switches to the HTML body.
+- `account` (optional) picks which of your email accounts sends the message — an SMTP address or
+  display name; valid values come from `outlook_status` (`accounts`). Omit for the default account.
 - `attachments` is a list of **absolute local file paths**; a missing path is an error raised
   before anything is displayed or sent.
 - `importance`: 0 = low, 1 = normal, 2 = high.

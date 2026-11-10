@@ -138,6 +138,7 @@ SEND_EMAIL: Dict[str, Any] = {
         "type": "object",
         "properties": {
             "to": {"type": "string", "description": "Recipients (To), semicolon-separated email addresses or names."},
+            "account": {"type": "string", "description": "Which of your email accounts sends the message — an SMTP address or display name (e.g. 'lauritz.loy@ifco.com'). Valid values are in outlook_status `accounts`. Omit to use the default account."},
             "cc": {"type": "string", "description": "CC recipients, semicolon-separated."},
             "bcc": {"type": "string", "description": "BCC recipients, semicolon-separated."},
             "subject": {"type": "string", "description": "Subject line."},

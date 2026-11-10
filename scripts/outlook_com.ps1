@@ -198,6 +198,17 @@ function Invoke-Status {
         }
     }
 
+    $accountList = @()
+    try {
+        foreach ($a in $script:ns.Accounts) {
+            $accountList += [pscustomobject]@{
+                display_name = [string]$a.DisplayName
+                smtp_address = [string]$a.SmtpAddress
+                user_name    = [string]$a.UserName
+            }
+        }
+    } catch {}
+
     [pscustomobject]@{
         ok               = $true
         action           = 'status'
@@ -206,6 +217,8 @@ function Invoke-Status {
         default_store    = [string]$script:ns.DefaultStore.DisplayName
         store_count      = $storeList.Count
         stores           = $storeList
+        account_count    = $accountList.Count
+        accounts         = $accountList
     }
 }
 
@@ -490,11 +503,30 @@ function Invoke-SendEmail {
     $send = $false
     if ($null -ne $P.send) { $send = [bool]$P.send }
 
+    # Optional: pick which of the user's email accounts sends the message.
+    $acct = $null
+    if ($null -ne $P.account -and $P.account) {
+        $want = [string]$P.account
+        foreach ($a in $script:ns.Accounts) {
+            $smtp = ''; try { $smtp = [string]$a.SmtpAddress } catch {}
+            $disp = ''; try { $disp = [string]$a.DisplayName } catch {}
+            if ($smtp -eq $want -or $disp -eq $want -or $smtp -like "*$want*" -or $disp -like "*$want*") {
+                $acct = $a
+                break
+            }
+        }
+        if ($null -eq $acct) {
+            $avail = (@($script:ns.Accounts | ForEach-Object { [string]$_.SmtpAddress }) -join ', ')
+            throw "Sender account '$want' not found. Available: $avail"
+        }
+    }
+
     $mail = $script:outlook.CreateItem(0)   # 0 = olMailItem
     $mail.Subject = [string]$P.subject
     $mail.To = $to
     if ($null -ne $P.cc -and $P.cc) { $mail.CC = [string]$P.cc }
     if ($null -ne $P.bcc -and $P.bcc) { $mail.BCC = [string]$P.bcc }
+    if ($null -ne $acct) { $mail.SendUsingAccount = $acct }
 
     $body = [string]$P.body
     $html = $false
@@ -515,17 +547,19 @@ function Invoke-SendEmail {
     }
 
     $subj = [string]$mail.Subject
+    $acctAddr = ''
+    if ($null -ne $acct) { try { $acctAddr = [string]$acct.SmtpAddress } catch {} }
     if ($send) {
         $mail.Send()
         [pscustomobject]@{
             ok = $true; action = 'send_email'; sent = $true; mode = 'send'
-            subject = $subj; to = $to
+            subject = $subj; to = $to; account = $acctAddr
         }
     } else {
         $mail.Display()
         [pscustomobject]@{
             ok = $true; action = 'send_email'; sent = $false; mode = 'draft'
-            subject = $subj; to = $to
+            subject = $subj; to = $to; account = $acctAddr
         }
     }
 }
