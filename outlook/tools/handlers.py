@@ -45,6 +45,10 @@ def _summary(action: str, data: Dict[str, Any]) -> str:
     if action == "send_email":
         mode = "sent" if data.get("sent") else "opened as a draft in Outlook for review"
         return f"Email {mode}: '{data.get('subject', '(no subject)')}' to {data.get('to', '?')}."
+    if action == "reply_email":
+        kind = "Reply-all" if data.get("reply_all") else "Reply"
+        mode = "sent" if data.get("sent") else "opened as a draft in Outlook for review"
+        return f"{kind} {mode}: '{data.get('subject', '(no subject)')}'."
     return "Done."
 
 
@@ -84,6 +88,12 @@ def outlook_send_email(args: Mapping[str, Any], task_id: str = "default", **kwar
     return _run("send_email", args)
 
 
+@guarded
+def outlook_reply_email(args: Mapping[str, Any], task_id: str = "default", **kwargs: Any) -> str:
+    del task_id, kwargs
+    return _run("reply_email", args)
+
+
 HANDLERS: Dict[str, Any] = {
     "outlook_status": outlook_status,
     "outlook_list_mailboxes": outlook_list_mailboxes,
@@ -91,6 +101,7 @@ HANDLERS: Dict[str, Any] = {
     "outlook_search_emails": outlook_search_emails,
     "outlook_get_email": outlook_get_email,
     "outlook_send_email": outlook_send_email,
+    "outlook_reply_email": outlook_reply_email,
 }
 
 __all__ = ["HANDLERS"]

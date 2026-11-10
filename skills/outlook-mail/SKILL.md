@@ -39,6 +39,7 @@ Use the `outlook_*` tools (they start with `outlook_`). This skill covers *how* 
 | Scan/search messages across one or all mailboxes | `outlook_search_emails` |
 | Read one full email (body, recipients, attachments) | `outlook_get_email` |
 | Compose/send an email (draft or send) | `outlook_send_email` |
+| Reply / reply-all to an email (draft or send) | `outlook_reply_email` |
 
 ## Searching well
 
@@ -77,6 +78,17 @@ passed explicitly.
 - `importance`: 0 = low, 1 = normal, 2 = high.
 - After a draft opens, the user edits/attaches more in Outlook and sends from there — no
   round-trip back through the tool needed.
+
+## Replying (incl. shared mailboxes you can't send from)
+
+`outlook_reply_email` replies to an existing message with `reply_all: false` (sender only) or
+`true` (everyone). It uses Outlook's `Reply()`/`ReplyAll()`, which pre-fills To/Subject/quote and
+carries the **correct From identity** — including shared mailboxes where you can answer but have
+no direct send rights. That is the tool to use for "answer this mail in `SAP 2RiHana`".
+
+- Pass `entry_id` (and the same `store`) from an `outlook_search_emails` result.
+- `body` is placed above the quoted original; omit it to start an empty reply.
+- Default `send: false` opens the reply as a draft for review, exactly like `outlook_send_email`.
 
 ## Limits & gotchas
 

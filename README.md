@@ -17,6 +17,7 @@ Windows-only. Talks to the local Outlook MAPI session through `Outlook.Applicati
 | `outlook_search_emails` | Search across one mailbox or **all** mailboxes; filters for subject/sender/recipient/body/unread/attachments/date range. |
 | `outlook_get_email` | Full email by EntryID: recipients, body, attachments, categories, flags. |
 | `outlook_send_email` | Compose and send — or open as a draft for review — an email with attachments, from any of your accounts. |
+| `outlook_reply_email` | Reply / reply-all to an email (correct identity, incl. shared mailboxes), draft or send. |
 
 ## How it works
 

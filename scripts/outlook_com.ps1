@@ -564,6 +564,59 @@ function Invoke-SendEmail {
     }
 }
 
+function Invoke-ReplyEmail {
+    param($P)
+    $entryId = [string]$P.entry_id
+    if ([string]::IsNullOrWhiteSpace($entryId)) { throw "entry_id is required." }
+
+    $storeName = $P.store
+    $storeId = $null
+    if ($storeName) {
+        $s = Get-Store $storeName
+        if ($null -eq $s) { throw "Mailbox '$storeName' not found." }
+        $storeId = $s.StoreID
+    }
+
+    $item = $null
+    if ($null -ne $storeId) { $item = $script:ns.GetItemFromID($entryId, $storeId) }
+    else { $item = $script:ns.GetItemFromID($entryId) }
+    if ($null -eq $item) { throw "No email found for that entry_id." }
+
+    $replyAll = $false
+    if ($null -ne $P.reply_all) { $replyAll = [bool]$P.reply_all }
+    $send = $false
+    if ($null -ne $P.send) { $send = [bool]$P.send }
+
+    # Reply()/ReplyAll() pre-fill To/Subject/quote AND carry the correct From identity,
+    # including shared mailboxes the user can answer but not send from directly.
+    $reply = if ($replyAll) { $item.ReplyAll() } else { $item.Reply() }
+
+    $body = [string]$P.body
+    if ($body) {
+        $reply.Body = $body + "`r`n`r`n" + $reply.Body
+    }
+
+    $subj = [string]$reply.Subject
+    $sendAcct = ''
+    try { if ($reply.SendUsingAccount) { $sendAcct = [string]$reply.SendUsingAccount.SmtpAddress } } catch {}
+    $onBehalf = ''
+    try { $onBehalf = [string]$reply.SentOnBehalfOfName } catch {}
+
+    if ($send) {
+        $reply.Send()
+        [pscustomobject]@{
+            ok = $true; action = 'reply_email'; sent = $true; mode = 'send'
+            subject = $subj; reply_all = $replyAll; account = $sendAcct; on_behalf_of = $onBehalf
+        }
+    } else {
+        $reply.Display()
+        [pscustomobject]@{
+            ok = $true; action = 'reply_email'; sent = $false; mode = 'draft'
+            subject = $subj; reply_all = $replyAll; account = $sendAcct; on_behalf_of = $onBehalf
+        }
+    }
+}
+
 # --- Main -------------------------------------------------------------------
 
 try {
@@ -582,6 +635,7 @@ try {
         'search_emails'   { $result = Invoke-Search $p }
         'get_email'       { $result = Invoke-GetEmail $p }
         'send_email'      { $result = Invoke-SendEmail $p }
+        'reply_email'     { $result = Invoke-ReplyEmail $p }
         default           { throw "Unknown action: $action" }
     }
     Write-Result $result

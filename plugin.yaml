@@ -1,5 +1,5 @@
 name: hermes-outlook
-version: 1.2.0
+version: 1.3.0
 manifest_version: 2
 api_version: 1
 description: >-
@@ -19,6 +19,7 @@ provides_tools:
   - outlook_search_emails
   - outlook_get_email
   - outlook_send_email
+  - outlook_reply_email
 config_schema:
   powershell_path:
     type: str

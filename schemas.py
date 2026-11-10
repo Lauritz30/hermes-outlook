@@ -152,6 +152,27 @@ SEND_EMAIL: Dict[str, Any] = {
     },
 }
 
+REPLY_EMAIL: Dict[str, Any] = {
+    "name": "outlook_reply_email",
+    "description": (
+        "Reply to (or reply-all on) an existing email using the correct sending identity — "
+        "including shared mailboxes you can answer but not send from directly. By default "
+        "(send=false) the reply is opened as a draft in Outlook for review; set send=true to send "
+        "immediately. Pass entry_id (from outlook_search_emails) plus the same store."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "entry_id": {"type": "string", "description": "Outlook EntryID of the email to reply to (from outlook_search_emails)."},
+            "store": STORE,
+            "reply_all": {"type": "boolean", "description": "true = reply to all; false (default) = reply to sender only."},
+            "body": {"type": "string", "description": "Reply text, placed above the quoted original. Omit to start with an empty reply."},
+            "send": {"type": "boolean", "description": "true = send now; false (default) = open as a draft for review."},
+        },
+        "required": ["entry_id"],
+    },
+}
+
 TOOL_SCHEMAS = (
     STATUS,
     LIST_MAILBOXES,
@@ -159,6 +180,7 @@ TOOL_SCHEMAS = (
     SEARCH_EMAILS,
     GET_EMAIL,
     SEND_EMAIL,
+    REPLY_EMAIL,
 )
 
 __all__ = [
@@ -166,6 +188,7 @@ __all__ = [
     "GET_EMAIL",
     "LIST_FOLDERS",
     "LIST_MAILBOXES",
+    "REPLY_EMAIL",
     "SEARCH_EMAILS",
     "SEND_EMAIL",
     "STATUS",
